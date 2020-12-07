@@ -1,0 +1,84 @@
+# This is a basic workflow to help you get started with Actions
+#
+name: Build Artifact, Build & Push Image
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore: 
+      - kubernetes/**
+      - .github/workflows/**
+      - datadog/**
+  pull_request:
+    branches: [ main ]
+    paths-ignore:
+      - kubernetes/**
+      - .github/workflows/**
+      - datadog/**
+
+env:
+  # TODO: Change registry URL if not using Docker Hub
+  CONTAINER_REGISTRY_URL: https://registry.hub.docker.com
+  # TODO: Change Registry USERID to your userid
+  REGISTRY_USERID: omearaj
+  IMAGE_NAME: java-goof-tren 
+
+jobs:
+  snyk_vulnerability_check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      
+      - name: Cache local Maven repository
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      
+      - name: Run Snyk test
+        uses: snyk/actions/maven@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_API_TOKEN }}
+        with:
+          command: test
+      
+      - name: Run Snyk monitor
+        uses: snyk/actions/maven@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_API_TOKEN }}
+        with:
+          command: monitor
+          args: --severity-threshold=high
+        
+  # Push image to Container Registry
+  build-and-push-Docker-Image:
+    # Ensure test job passes before pushing image.
+    needs: snyk_vulnerability_check
+
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+
+    steps:
+      - uses: actions/checkout@v2
+                 
+      - name: Build and push Docker images
+        uses: docker/build-push-action@v1
+        with:
+         username: ${{ env.REGISTRY_USERID }}
+         password: ${{ secrets.DOCKER_KEY }}
+         repository: omearaj/${{ env.IMAGE_NAME }}
+         tag_with_ref: true
+         tag_with_sha: true  
+         add_git_labels: true  
+      
+#      - name: Run Snyk to check Docker images for vulnerabilities
+#        uses: snyk/actions/docker@master
+#        env:
+#          SNYK_TOKEN: ${{ secrets.SNYK_API_TOKEN }}
+#        with:
+#         image: omearaj/${{ env.IMAGE_NAME }}
+#         command: test  
