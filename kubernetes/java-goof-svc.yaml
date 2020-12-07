@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: java-goof
+  labels:
+    app: java-goof
+spec:
+  type: LoadBalancer
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+  selector:
+    app: java-goof
+    
