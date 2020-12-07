@@ -19,7 +19,7 @@ env:
   CONTAINER_REGISTRY_URL: https://registry.hub.docker.com
   # TODO: Change Registry USERID to your userid
   REGISTRY_USERID: omearaj
-  IMAGE_NAME: java-goof-tren 
+  IMAGE_NAME: java-goof-trend 
 
 jobs:
   snyk_vulnerability_check:
