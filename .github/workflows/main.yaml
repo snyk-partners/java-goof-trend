@@ -8,13 +8,11 @@ on:
     paths-ignore: 
       - kubernetes/**
       - .github/workflows/**
-      - datadog/**
   pull_request:
     branches: [ main ]
     paths-ignore:
       - kubernetes/**
       - .github/workflows/**
-      - datadog/**
 
 env:
   # TODO: Change registry URL if not using Docker Hub
