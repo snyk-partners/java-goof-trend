@@ -81,8 +81,8 @@ jobs:
           DSSC_IMAGE_PULL_AUTH: '{"username": "${{ env.REGISTRY_USERID }}","password": "${{ secrets.DOCKER_KEY }}"}'
 
           # Optional
-         DSSC_INSECURE_SKIP_TLS_VERIFY: true
-         DSSC_INSECURE_SKIP_REGISTRY_TLS_VERIFY: false
+          DSSC_INSECURE_SKIP_TLS_VERIFY: true
+          DSSC_INSECURE_SKIP_REGISTRY_TLS_VERIFY: false
           # DSSC_PREREGISTRY_SCAN: false
           # DSSC_PREREGISTRY_HOST: myorg.com
           # DSSC_PREREGISTRY_USER: admin
